@@ -18,6 +18,24 @@ $ npm install knex-automigrate -g
 
 ## Usage
 
+```bash
+Usage: knex-automigrate [options] [command]
+
+
+Commands:
+
+  migrate:auto           Run all migration table schemas.
+
+Options:
+
+  -h, --help         output usage information
+  -V, --version      output the version number
+  --debug            Run with debugging.
+  --knexfile [path]  Specify the knexfile path.
+  --cwd [path]       Specify the working directory.
+  --env [name]       environment, default: process.env.NODE_ENV || development
+```
+
 ### Before (traditional database migration with knex.js)
 
 ```bash
