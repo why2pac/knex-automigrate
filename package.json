@@ -34,6 +34,7 @@
   "devDependencies": {
     "mocha": "^3.5.0",
     "mysql": "^2.14.1",
+    "nodemon": "^1.17.5",
     "standard": "^11.0.1"
   },
   "bin": {
@@ -46,6 +47,11 @@
     "index.js",
     "LICENSE"
   ],
+  "standard": {
+    "env": [
+      "mocha"
+    ]
+  },
   "author": "GONZO",
   "license": "MIT",
   "bugs": {
