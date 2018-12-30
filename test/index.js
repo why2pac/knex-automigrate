@@ -1,5 +1,5 @@
-describe('knex-automigrate', function () {
-  it('not yet', function (done) {
-    done()
-  })
-})
+describe('knex-automigrate', () => {
+  it('not yet', (done) => {
+    done();
+  });
+});

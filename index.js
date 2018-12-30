@@ -1,1 +1,1 @@
-module.exports = require('./lib/automigrate')
+module.exports = require('./lib/automigrate');
