@@ -34,10 +34,11 @@
     "eslint": "^5.11.1",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
+    "husky": "^1.3.1",
     "mocha": "^5.2.0",
     "mysql": "^2.16.0",
-    "npm-check": "^5.9.0",
-    "nodemon": "^1.18.6"
+    "nodemon": "^1.18.6",
+    "npm-check": "^5.9.0"
   },
   "bin": {
     "knex-automigrate": "./bin/cli.js"
@@ -49,6 +50,12 @@
     "index.js",
     "LICENSE"
   ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lintfix",
+      "pre-push": "npm test"
+    }
+  },
   "author": "GONZO",
   "license": "MIT",
   "bugs": {
