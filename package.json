@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run lint && mocha --reporter spec --bail --check-leaks test/index.js",
+    "test:migrate": "node bin/cli.js migrate:auto --knexfile ./test/migration/knex.config.js --cwd ./test/migration",
     "check": "npm-check",
     "lint": "eslint ./",
     "lintfix": "eslint ./ --fix",
@@ -23,22 +24,21 @@
     "migration"
   ],
   "dependencies": {
-    "knex": "^0.16.3",
-    "commander": "^2.19.0",
-    "chalk": "^2.4.1",
-    "tildify": "^1.2.0",
-    "liftoff": "^2.5.0",
-    "minimist": "^1.2.0"
+    "chalk": "^4.1.0",
+    "commander": "^6.0.0",
+    "knex": "^0.21.4",
+    "liftoff": "^3.1.0",
+    "minimist": "^1.2.5",
+    "tildify": "^2.0.0"
   },
   "devDependencies": {
-    "eslint": "^5.11.1",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0",
-    "husky": "^1.3.1",
-    "mocha": "^5.2.0",
-    "mysql": "^2.16.0",
-    "nodemon": "^1.18.6",
-    "npm-check": "^5.9.0"
+    "eslint": "^7.6.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0",
+    "husky": "^4.2.5",
+    "mocha": "^8.1.1",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.4"
   },
   "bin": {
     "knex-automigrate": "./bin/cli.js"
