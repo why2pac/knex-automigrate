@@ -25,20 +25,20 @@
   ],
   "dependencies": {
     "chalk": "^4.1.0",
-    "commander": "^6.0.0",
-    "knex": "^0.21.4",
+    "commander": "^6.2.1",
+    "knex": "^0.21.15",
     "liftoff": "^3.1.0",
     "minimist": "^1.2.5",
     "tildify": "^2.0.0"
   },
   "devDependencies": {
-    "eslint": "^7.6.0",
-    "eslint-config-airbnb-base": "^14.2.0",
-    "eslint-plugin-import": "^2.22.0",
-    "husky": "^4.2.5",
-    "mocha": "^8.1.1",
+    "eslint": "^7.17.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "husky": "^4.3.7",
+    "mocha": "^8.2.1",
     "mysql": "^2.18.1",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.7"
   },
   "bin": {
     "knex-automigrate": "./bin/cli.js"
