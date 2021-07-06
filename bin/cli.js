@@ -5,7 +5,7 @@ const argv = require('minimist')(process.argv.slice(2));
 const commander = require('commander');
 const chalk = require('chalk');
 const tildify = require('tildify');
-const cliPkg = require('../package');
+const cliPkg = require('../package.json');
 
 const cli = new Liftoff({ name: 'knex-automigrate' });
 const invoke = function invoke(envParams) {
