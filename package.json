@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run lint && mocha --reporter spec --bail --check-leaks test/index.js",
-    "test:migrate": "node bin/cli.js migrate:auto --knexfile ./test/migration/knex.config.js --cwd ./test/migration",
+    "test:migrate": "node bin/cli.js migrate:auto --safe --knexfile ./test/migration/knex.config.js --cwd ./test/migration",
     "check": "npm-check",
     "lint": "eslint ./",
     "lintfix": "eslint ./ --fix",

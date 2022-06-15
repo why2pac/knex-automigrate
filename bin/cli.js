@@ -14,6 +14,7 @@ const invoke = function invoke(envParams) {
   commander
     .version(`Knex Automigrate CLI version: ${cliPkg.version}`)
     .option('--debug', 'Run with debugging.')
+    .option('--safe', 'Run as safe mode, which is do not delete existing columns.')
     .option('--knexfile [path]', 'Specify the knexfile path.')
     .option('--cwd [path]', 'Specify the working directory.')
     .option('--env [name]', 'environment, default: process.env.NODE_ENV || development');
@@ -61,6 +62,7 @@ const invoke = function invoke(envParams) {
     }
 
     if (argv.debug !== undefined) { config.debug = argv.debug; }
+    if (argv.safe !== undefined) { config.safe = !!argv.safe; }
 
     return config;
   };
