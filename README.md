@@ -96,7 +96,7 @@ App
 // table_users.js
 exports.auto = function(migrator, knex) {
   return [
-    migrator('hama_users', function(table) {
+    migrator('users', function(table) {
       table.increments('user_id').unsigned().comment('PK');
       table.string('email', 128).notNullable().comment('E-Mail');
       table.string('nickname', 128).notNullable().comment('Name');
@@ -113,7 +113,7 @@ $ knex-automigrate migrate:auto
 // table_users.js
 exports.auto = function(migrator, knex) {
   return [
-    migrator('hama_users', function(table) {
+    migrator('users', function(table) {
       table.increments('user_id').unsigned().comment('PK');
       table.string('email', 64).notNullable().comment('E-Mail');
       table.string('name', 64).notNullable().comment('Name');
