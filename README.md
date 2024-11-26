@@ -142,7 +142,3 @@ App
 ## License
 
 [MIT License](http://www.opensource.org/licenses/mit-license.php)
-
-## Author
-
-[GONZO](https://github.com/why2pac) ([oss@dp.farm](mailto:oss@dp.farm))
