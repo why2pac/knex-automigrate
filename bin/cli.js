@@ -97,7 +97,7 @@ cli.on('requireFail', (name) => {
   console.log(chalk.red('Failed to load external module'), chalk.magenta(name)); // eslint-disable-line no-console
 });
 
-cli.launch({
+cli.prepare({
   cwd: argv.cwd,
   configPath: argv.knexfile,
   require: argv.require,
