@@ -10,7 +10,7 @@
     "lint": "eslint ./",
     "lintfix": "eslint ./ --fix",
     "release:patch": "npm version patch --no-git-tag-version",
-    "prereleasex": "git diff --exit-code",
+    "prerelease": "git diff --exit-code",
     "release": "npm run release:patch && export RELEASE_VER=$(node -e \"console.log(require('./package.json').version)\") && git checkout -b feature/bump-ver_${RELEASE_VER} && git add . && git commit -m \"Bump version, v${RELEASE_VER}\" &&git tag -a v${RELEASE_VER} -m \"Release version, v${RELEASE_VER}\" && git push --set-upstream origin feature/bump-ver_${RELEASE_VER} && git push origin v${RELEASE_VER}"
   },
   "repository": {
