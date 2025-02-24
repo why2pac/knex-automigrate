@@ -3,6 +3,7 @@ const automigrate = require('../lib/automigrate');
 const config = require('./migration/knex.config');
 
 const tableName = `TEST_${new Date().getTime()}`;
+const viewName = `${tableName}_VIEW`;
 
 const getKnex = () => knex(config);
 
@@ -11,6 +12,18 @@ const getTableInfo = async (name) => {
   const table = getKnex().from(name);
   const columnInfo = await table.columnInfo();
   const schema = (await kx.raw(`SHOW CREATE TABLE \`${tableName}\``))[0][0]['Create Table'].split('`')
+    .join('')
+    .split('\n')
+    .map((e) => e.trim());
+
+  return { columnInfo, schema };
+};
+
+const getViewInfo = async (name) => {
+  const kx = getKnex();
+  const view = getKnex().from(name);
+  const columnInfo = await view.columnInfo();
+  const schema = (await kx.raw(`SHOW CREATE VIEW \`${viewName}\``))[0][0]['Create View'].split('`')
     .join('')
     .split('\n')
     .map((e) => e.trim());
@@ -40,11 +53,21 @@ describe('knex-automigrate', () => {
           table.index(['ID_3', 'ID_2', 'ID'], 'ID_Index_Name');
         }),
       ],
+      views: (migrator, kx) => [
+        migrator(viewName, (view) => {
+          view.columns(['ID', 'ID_2', 'ID_3', 'VAL', 'BIGINT', 'DECIMAL', 'EXPIRY_AT', 'CREATED_AT']);
+          view.as(
+            kx(tableName)
+              .select('ID', 'ID_2', 'ID_3', 'VAL', 'BIGINT', 'DECIMAL', 'EXPIRY_AT', 'CREATED_AT')
+            ,
+          );
+        }),
+      ],
     });
 
-    const info = await getTableInfo(tableName);
+    const tableInfo = await getTableInfo(tableName);
 
-    expect(info.columnInfo).toMatchObject({
+    expect(tableInfo.columnInfo).toMatchObject({
       ID: {
         defaultValue: null, type: 'varchar', maxLength: 128, nullable: false,
       },
@@ -65,10 +88,35 @@ describe('knex-automigrate', () => {
       },
     });
 
-    expect(info.schema.find((stmt) => stmt.includes('CREATED_AT')).indexOf('Created at')).toBeGreaterThanOrEqual(0);
-    expect(info.schema.find((stmt) => stmt.includes('PRIMARY KEY')).indexOf('ID,ID_2')).toBeGreaterThanOrEqual(0);
-    expect(info.schema.find((stmt) => stmt.includes('Unique_Key_Name')).indexOf('ID_2,ID_3')).toBeGreaterThanOrEqual(0);
-    expect(info.schema.find((stmt) => stmt.includes('ID_Index_Name')).indexOf('ID_3,ID_2,ID')).toBeGreaterThanOrEqual(0);
+    expect(tableInfo.schema.find((stmt) => stmt.includes('CREATED_AT')).indexOf('Created at')).toBeGreaterThanOrEqual(0);
+    expect(tableInfo.schema.find((stmt) => stmt.includes('PRIMARY KEY')).indexOf('ID,ID_2')).toBeGreaterThanOrEqual(0);
+    expect(tableInfo.schema.find((stmt) => stmt.includes('Unique_Key_Name')).indexOf('ID_2,ID_3')).toBeGreaterThanOrEqual(0);
+    expect(tableInfo.schema.find((stmt) => stmt.includes('ID_Index_Name')).indexOf('ID_3,ID_2,ID')).toBeGreaterThanOrEqual(0);
+
+    const viewInfo = await getViewInfo(viewName);
+
+    expect(viewInfo.columnInfo).toMatchObject({
+      ID: {
+        defaultValue: null, type: 'varchar', maxLength: 128, nullable: false,
+      },
+      VAL: {
+        defaultValue: null, type: 'longtext', maxLength: 4294967295, nullable: false,
+      },
+      BIGINT: {
+        defaultValue: null, type: 'bigint', maxLength: null, nullable: true,
+      },
+      DECIMAL: {
+        defaultValue: null, type: 'decimal', maxLength: null, nullable: true,
+      },
+      EXPIRY_AT: {
+        defaultValue: null, type: 'datetime', maxLength: null, nullable: true,
+      },
+      CREATED_AT: {
+        defaultValue: 'CURRENT_TIMESTAMP', type: 'datetime', maxLength: null, nullable: false,
+      },
+    });
+
+    expect(viewInfo.schema.some((stmt) => stmt.includes('CREATED_AT'))).toEqual(true);
   });
 
   it('modify exist colums', async () => {
@@ -193,5 +241,6 @@ describe('knex-automigrate', () => {
 
   it('drop table', async () => {
     await getKnex().schema.dropTable(tableName);
+    await getKnex().schema.dropView(viewName);
   });
 });
