@@ -120,17 +120,6 @@ exports.auto = function(migrator, knex) {
     });
   ];
 });
-
-// view_users.js
-exports.auto = function(migrator, knex) {
-  return [
-    migrator('user_information', (view) => {
-      // If view.columns() is missing,
-      // the columns will default to those defined in the 'select()' statement.
-      view.as(knex('users').select('user_id', 'email', 'name'));
-    }),
-  ];
-});
 ```
 
 ```bash
@@ -142,8 +131,7 @@ Migration files are,
 ```
 App
 　├─ migrations
-　│　　├─ table_users.js
-　│　　└─ view_users.js
+　│　　└─ table_users.js
 　└─ knexfile.js
 ```
 
