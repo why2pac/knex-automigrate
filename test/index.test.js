@@ -52,6 +52,7 @@ describe('knex-automigrate', () => {
           table.unique(['ID_2', 'ID_3'], 'Unique_Key_Name');
           table.index(['ID_3', 'ID_2', 'ID'], 'ID_Index_Name');
           table.index(['ID'], 'ID_Fulltext_Index_Name', { indexType: 'FULLTEXT' });
+          table.index(['VAL'], 'VAL_Fulltext_Index_name', { indexType: 'FULLTEXT', parser: 'ngram' });
         }),
       ],
       views: (migrator, kx) => [
@@ -100,6 +101,7 @@ describe('knex-automigrate', () => {
     expect(tableInfo.schema.find((stmt) => stmt.includes('Unique_Key_Name')).indexOf('ID_2,ID_3')).toBeGreaterThanOrEqual(0);
     expect(tableInfo.schema.find((stmt) => stmt.includes('ID_Index_Name')).indexOf('ID_3,ID_2,ID')).toBeGreaterThanOrEqual(0);
     expect(tableInfo.schema.find((stmt) => stmt.includes('ID_Fulltext_Index_Name')).indexOf('ID')).toBeGreaterThanOrEqual(0);
+    expect(tableInfo.schema.find((stmt) => stmt.includes('VAL_Fulltext_Index_name'))).toMatch(/FULLTEXT KEY VAL_Fulltext_Index_name.*WITH PARSER ngram/);
 
     const viewInfo = await getViewInfo(viewName);
 
@@ -148,6 +150,7 @@ describe('knex-automigrate', () => {
           table.unique(['ID_2', 'ID_3'], 'Unique_Key_Name');
           table.index(['ID_3', 'ID_2', 'ID'], 'ID_Index_Name');
           table.index(['ID'], 'ID_Fulltext_Index_Name', { indexType: 'FULLTEXT' });
+          table.index(['VAL'], 'VAL_Fulltext_Index_name', { indexType: 'FULLTEXT', parser: 'ngram' });
         }),
       ],
     });
@@ -189,6 +192,7 @@ describe('knex-automigrate', () => {
     expect(info.schema.find((stmt) => stmt.includes('Unique_Key_Name')).indexOf('ID_2,ID_3')).toBeGreaterThanOrEqual(0);
     expect(info.schema.find((stmt) => stmt.includes('ID_Index_Name')).indexOf('ID_3,ID_2,ID')).toBeGreaterThanOrEqual(0);
     expect(info.schema.find((stmt) => stmt.includes('ID_Fulltext_Index_Name')).indexOf('ID')).toBeGreaterThanOrEqual(0);
+    expect(info.schema.find((stmt) => stmt.includes('VAL_Fulltext_Index_name'))).toMatch(/FULLTEXT KEY VAL_Fulltext_Index_name.*WITH PARSER ngram/);
   });
 
   it('modify exist colums', async () => {
@@ -244,6 +248,7 @@ describe('knex-automigrate', () => {
     expect(info.schema.find((stmt) => stmt.includes('Unique_Key_Name'))).toBe(undefined);
     expect(info.schema.find((stmt) => stmt.includes('ID_Index_Name'))).toBe(undefined);
     expect(info.schema.find((stmt) => stmt.includes('ID_Fulltext_Index_Name'))).toBe(undefined);
+    expect(info.schema.find((stmt) => stmt.includes('VAL_Fulltext_Index_name'))).toBe(undefined);
   });
 
   it('drop exist colums', async () => {
