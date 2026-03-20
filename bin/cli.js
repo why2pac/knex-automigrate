@@ -2,7 +2,7 @@
 
 const Liftoff = require('liftoff');
 const argv = require('minimist')(process.argv.slice(2));
-const commander = require('commander');
+const { program: commander } = require('commander');
 const chalk = require('chalk');
 const tildify = require('tildify');
 const cliPkg = require('../package.json');
