@@ -21,9 +21,9 @@ const invoke = function invoke(envParams) {
 
   const exit = function exit(text) {
     if (text instanceof Error) {
-      chalk.red(console.error(text.stack)); // eslint-disable-line no-console
+      console.error(chalk.red(text.stack)); // eslint-disable-line no-console
     } else {
-      chalk.red(console.error(text)); // eslint-disable-line no-console
+      console.error(chalk.red(text)); // eslint-disable-line no-console
     }
     process.exit(1);
   };
