@@ -3,6 +3,7 @@ module.exports = {
   env: {
     jest: true,
   },
+  ignorePatterns: ['dist/', 'src/'],
   overrides: [
     {
       files: ['test/**/*.js'],

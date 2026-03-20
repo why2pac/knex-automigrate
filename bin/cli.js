@@ -74,10 +74,10 @@ const invoke = function invoke(envParams) {
       const config = initKnex(envParams);
 
       // eslint-disable-next-line global-require
-      pending = require('../lib/automigrate')({
+      pending = require('..')(({
         config,
-        path: process.cwd(),
-      }).then(() => {
+        cwd: process.cwd(),
+      })).then(() => {
         success('* Migration successfully done.');
       }).catch(exit);
     });

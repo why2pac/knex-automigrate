@@ -3,14 +3,22 @@ knex-automigrate
 
 [![NPM Version](https://img.shields.io/npm/v/knex-automigrate.svg)](https://npmjs.org/package/knex-automigrate)
 [![NPM Downloads](https://img.shields.io/npm/dm/knex-automigrate.svg)](https://npmjs.org/package/knex-automigrate)
-[![Dependency Status](https://david-dm.org/why2pac/knex-automigrate.svg)](https://david-dm.org/why2pac/knex-automigrate)
 
-Table schema based database migration tool, built on top of the knex.js
+Table schema based database migration tool, built on top of [knex.js](http://knexjs.org).
 
-- Migration schema file name must be started with `table_`.
-- Currently supported dialects to index migration : `mysql`
+Define your table schema once and let knex-automigrate handle CREATE, ALTER, and DROP operations automatically — no numbered migration files needed.
+
+- Written in **TypeScript** with full type declarations included
+- Migration schema file name must start with `table_` or `view_`
+- Currently supported dialects for index migration: `mysql`, `mysql2`
 
 ## Installation
+
+```bash
+$ npm install knex-automigrate
+```
+
+For CLI usage (global install):
 
 ```bash
 $ npm install knex-automigrate -g
@@ -18,31 +26,13 @@ $ npm install knex-automigrate -g
 
 ## Usage
 
-```bash
-Usage: knex-automigrate [options] [command]
-
-
-Commands:
-
-  migrate:auto           Run all migration table schemas.
-
-Options:
-
-  -h, --help         output usage information
-  -V, --version      output the version number
-  --debug            Run with debugging.
-  --knexfile [path]  Specify the knexfile path.
-  --cwd [path]       Specify the working directory.
-  --env [name]       environment, default: process.env.NODE_ENV || development
-```
-
 ### Before (traditional database migration with knex.js)
 
 ```bash
 $ knex migrate:make create_users_table
 ```
 
-```node
+```javascript
 // 201701010000_create_users_table.js
 exports.up = function(knex, Promise) {
   return Promise.all([
@@ -52,7 +42,7 @@ exports.up = function(knex, Promise) {
       table.string('nickname', 128).notNullable().comment('Name');
     })
   ]);
-});
+};
 ```
 
 ```bash
@@ -63,7 +53,7 @@ $ knex migrate:latest
 $ knex migrate:make alter_users_table
 ```
 
-```node
+```javascript
 // 201701010000_alter_users_table.js
 exports.up = function(knex, Promise) {
   return Promise.all([
@@ -73,7 +63,7 @@ exports.up = function(knex, Promise) {
       table.string('name', 64).notNullable().comment('Name');
     })
   ]);
-});
+};
 ```
 
 ```bash
@@ -92,24 +82,9 @@ App
 
 ### After (database migration with knex-automigrate)
 
-```node
-// table_users.js
-exports.auto = function(migrator, knex) {
-  return [
-    migrator('users', function(table) {
-      table.increments('user_id').unsigned().comment('PK');
-      table.string('email', 128).notNullable().comment('E-Mail');
-      table.string('nickname', 128).notNullable().comment('Name');
-    });
-  ];
-});
-```
+Migration files are named with `table_` or `view_` prefix. The prefix determines whether the file defines table schemas or view schemas.
 
-```bash
-$ knex-automigrate migrate:auto
-```
-
-```node
+```javascript
 // table_users.js
 exports.auto = function(migrator, knex) {
   return [
@@ -117,10 +92,12 @@ exports.auto = function(migrator, knex) {
       table.increments('user_id').unsigned().comment('PK');
       table.string('email', 64).notNullable().comment('E-Mail');
       table.string('name', 64).notNullable().comment('Name');
-    });
+    }),
   ];
-});
+};
+```
 
+```javascript
 // view_users.js
 exports.auto = function(migrator, knex) {
   return [
@@ -130,7 +107,7 @@ exports.auto = function(migrator, knex) {
       view.as(knex('users').select('user_id', 'email', 'name'));
     }),
   ];
-});
+};
 ```
 
 ```bash
@@ -147,9 +124,128 @@ App
 　└─ knexfile.js
 ```
 
+Simply edit the schema file and run `migrate:auto` again — columns are added, altered, or dropped automatically to match the definition.
+
+### CLI
+
+```
+Usage: knex-automigrate [options] [command]
+
+Commands:
+  migrate:auto           Run all migration table schemas.
+
+Options:
+  -V, --version      output the version number
+  --debug            Run with debugging.
+  --safe             Run as safe mode, which does not delete existing columns.
+  --knexfile [path]  Specify the knexfile path.
+  --cwd [path]       Specify the working directory.
+  --env [name]       environment, default: process.env.NODE_ENV || development
+  -h, --help         output usage information
+```
+
+## Programmatic Usage
+
+```javascript
+const Automigrate = require('knex-automigrate');
+
+await Automigrate({
+  config: {
+    client: 'mysql2',
+    connection: {
+      host: '127.0.0.1',
+      port: 3306,
+      database: 'my_database',
+      user: 'root',
+      password: null,
+    },
+    safe: false, // set true to prevent dropping existing columns
+  },
+  cwd: __dirname,           // directory to scan for table_*.js / view_*.js files
+  verbose: true,            // set false to suppress console output
+  tables: (migrator, knex) => [
+    migrator('users', (table) => {
+      table.increments('user_id').unsigned().comment('PK');
+      table.string('email', 128).notNullable().comment('E-Mail');
+      table.string('name', 64).notNullable().comment('Name');
+      table.datetime('created_at').notNullable().defaultTo(knex.fn.now()).comment('Created at');
+
+      table.primary(['user_id']);
+      table.unique(['email'], 'uk_users_email');
+      table.index(['created_at'], 'idx_users_created_at');
+    }),
+  ],
+  views: (migrator, knex) => [
+    migrator('user_summary', (view) => {
+      view.as(knex('users').select('user_id', 'email', 'name'));
+    }),
+  ],
+});
+```
+
+### TypeScript
+
+```typescript
+import Automigrate from 'knex-automigrate';
+
+await Automigrate({
+  config: {
+    client: 'mysql2',
+    connection: { host: '127.0.0.1', database: 'my_database', user: 'root', password: null },
+  },
+  tables: (migrator, knex) => [
+    migrator('users', (table) => {
+      table.increments('user_id').unsigned().comment('PK');
+      table.string('email', 128).notNullable().comment('E-Mail');
+    }),
+  ],
+});
+```
+
+### Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `config` | `Knex.Config & { safe?: boolean }` | Knex configuration. Set `safe: true` to prevent dropping columns. |
+| `cwd` | `string` | Directory to scan for `table_*.js` / `view_*.js` migration files. |
+| `verbose` | `boolean` | Enable/disable console output. Default: `true`. |
+| `tables` | `(migrator, knex) => MigrationEntry[]` | Inline table definitions (in addition to file-based). |
+| `views` | `(migrator, knex) => MigrationEntry[]` | Inline view definitions (in addition to file-based). |
+
+### Supported index types
+
+```javascript
+// Primary key
+table.primary(['id']);
+
+// Unique key
+table.unique(['email'], 'uk_users_email');
+
+// Regular index
+table.index(['status'], 'idx_users_status');
+
+// Fulltext index
+table.index(['title'], 'ft_articles_title', { indexType: 'FULLTEXT' });
+
+// Fulltext index with ngram parser
+table.index(['body'], 'ft_articles_body', { indexType: 'FULLTEXT', parser: 'ngram' });
+```
+
+## How it works
+
+1. Reads the current table schema from the database (`SHOW CREATE TABLE`)
+2. Compares it with the defined schema
+3. Automatically generates and runs the appropriate DDL:
+   - **New table** → `CREATE TABLE`
+   - **New column** → `ALTER TABLE ADD COLUMN`
+   - **Changed column** → `ALTER TABLE MODIFY COLUMN`
+   - **Removed column** → `ALTER TABLE DROP COLUMN` (unless `safe: true`)
+   - **New index** → `CREATE INDEX` / `ALTER TABLE ADD INDEX`
+   - **View** → `CREATE OR REPLACE VIEW`
+
 ## Dependencies
 
-* [Knex.js](http://knexjs.org)
+* [knex.js](http://knexjs.org) (peer dependency, `^3.1.0`)
 
 ## License
 

@@ -1,5 +1,5 @@
 const assert = require('assert');
-const AutomigrateLib = require('../../lib/index/index');
+const { loadIndexes: AutomigrateLib } = require('../../dist/index/index');
 
 // Fixture A: memberships — PK, composite UK, two regular indexes, three FKs.
 // MySQL auto-creates a KEY entry for each FK with the same name; those are removed by the dialect.

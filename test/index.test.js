@@ -1,6 +1,6 @@
 const path = require('path');
 const knex = require('knex');
-const automigrate = require('../lib/automigrate');
+const automigrate = require('..');
 const config = require('./migration/knex.config');
 
 const tableName = `TEST_${new Date().getTime()}`;

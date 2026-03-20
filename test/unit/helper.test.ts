@@ -1,7 +1,7 @@
-const assert = require('assert');
-const helper = require('../../dist/index/helper');
+import assert from 'assert';
+import * as helper from '../../src/index/helper';
 
-describe('helper', () => {
+describe('helper (ts)', () => {
   describe('innerBrackets', () => {
     it('returns content inside parentheses for PRIMARY KEY', () => {
       assert.strictEqual(helper.innerBrackets('PRIMARY KEY (`id`)'), '`id`');
@@ -76,12 +76,9 @@ describe('helper', () => {
     });
 
     it('documents that a space before a backtick prevents stripping (actual MySQL has no spaces)', () => {
-      // multipleColumns checks slice(0,1) === '`' before stripping.
-      // If a leading space is present (e.g. ", `b`"), the backtick is NOT stripped.
-      // Real MySQL SHOW CREATE TABLE output never has spaces here, so this is not an issue in practice.
-      const result = helper.multipleColumns('`a`, `b`');
-      assert.deepStrictEqual(result[0], 'a'); // first token: backtick stripped
-      assert.deepStrictEqual(result[1], '`b`'); // second token: space precedes backtick, not stripped
+      const result = helper.multipleColumns('`a`, `b`')!;
+      assert.deepStrictEqual(result[0], 'a');
+      assert.deepStrictEqual(result[1], '`b`');
     });
 
     it('handles column names with underscores and mixed case', () => {
@@ -146,18 +143,14 @@ describe('helper', () => {
     });
 
     it('returns true for two empty arrays (length equality check: 0 === 0)', () => {
-      // a.length === b.length → 0 === 0 → true, and [].every() vacuously returns true.
       assert.ok(helper.isArrayEqual([], []));
     });
 
     it('returns falsy when array lengths differ (longer second array)', () => {
-      // every() only iterates over 'a', so ['A'] vs ['A','B'] would be truthy — document it.
-      // ['A','B'] vs ['A'] is falsy because a[1] ('B') !== b[1] (undefined).
       assert.ok(!helper.isArrayEqual(['A', 'B'], ['A']));
     });
 
     it('returns false when arrays have same prefix but different length (fixed)', () => {
-      // a.length === b.length → 1 === 2 → false. Extra elements in b are rejected.
       const result = helper.isArrayEqual(['A'], ['A', 'B']);
       assert.ok(!result);
     });
