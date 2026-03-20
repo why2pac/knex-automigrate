@@ -14,7 +14,13 @@ module.exports = [
         ...globals.jest,
       },
     },
+    settings: {
+      'import/core-modules': ['knex'],
+    },
     rules: {
+      'import/no-extraneous-dependencies': ['error', {
+        devDependencies: ['eslint.config.js', 'jest.config.js', 'test/**', '**/*.test.*'],
+      }],
       'prefer-destructuring': [
         'error',
         {
