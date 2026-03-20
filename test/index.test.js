@@ -741,14 +741,8 @@ describe('knex-automigrate', () => {
 
     const dropAll = async () => {
       await getKnex().raw('SET foreign_key_checks = 0');
-      for (const v of fileViews) {
-        // eslint-disable-next-line no-await-in-loop
-        await getKnex().schema.dropViewIfExists(v);
-      }
-      for (const t of fileTables) {
-        // eslint-disable-next-line no-await-in-loop
-        await getKnex().schema.dropTableIfExists(t);
-      }
+      await Promise.all(fileViews.map((v) => getKnex().schema.dropViewIfExists(v)));
+      await Promise.all(fileTables.map((t) => getKnex().schema.dropTableIfExists(t)));
       await getKnex().raw('SET foreign_key_checks = 1');
     };
 
