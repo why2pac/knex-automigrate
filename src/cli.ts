@@ -48,7 +48,7 @@ const invoke = (envParams: LiftoffEnv): void => {
       console.log('Working directory changed to', chalk.magenta(tildify(env.cwd)));
     }
 
-    let environment: string | undefined = commander.env || process.env.NODE_ENV;
+    let environment: string | undefined = commander.opts().env || process.env.NODE_ENV;
     const defaultEnv = 'development';
     let config = require(env.configPath!);
 
