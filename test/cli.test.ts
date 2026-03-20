@@ -10,7 +10,7 @@ const MIGRATION_CWD = path.join(__dirname, 'migration');
 const KNEXFILE = path.join(MIGRATION_CWD, 'knex.config.js');
 const ENV_KNEXFILE = path.join(MIGRATION_CWD, 'knex.env.config.js');
 
-const run = (args: string[], opts: Record<string, any> = {}) => spawnSync(process.execPath, [CLI, ...args], {
+const run = (args: string[], opts: Record<string, any> = {}) => spawnSync(process.execPath, ['-r', 'ts-node/register/transpile-only', CLI, ...args], {
   encoding: 'utf8',
   timeout: 30000,
   ...opts,

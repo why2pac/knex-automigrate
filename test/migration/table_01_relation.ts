@@ -1,4 +1,6 @@
-exports.auto = (migrator) => [
+import { TableMigrator, MigrationEntry } from '../../src/automigrate';
+
+export const auto = (migrator: TableMigrator): MigrationEntry[] => [
   migrator('PHONES', (table) => {
     table.bigIncrements('PHONE_ID').unsigned().comment('Primary Key for Table.');
     table.string('PHONE', 128).notNullable().comment('Phone');
@@ -17,11 +19,11 @@ exports.auto = (migrator) => [
   }),
   migrator('CLASSES', (table) => {
     table.bigIncrements('CLASS_ID').unsigned().comment('Primary Key for Table.');
-    table.text('SUBJECT', 128).notNullable().comment('Subject');
+    table.string('SUBJECT', 128).notNullable().comment('Subject');
   }),
   migrator('CLASSES_DETAIL', (table) => {
     table.bigIncrements('CLASS_ID').unsigned().comment('Primary Key for Table.');
-    table.text('PROFESSOR', 128).notNullable().comment('Professor Name');
+    table.string('PROFESSOR', 128).notNullable().comment('Professor Name');
   }),
   migrator('STUDENTS_CLASSES', (table) => {
     table.bigInteger('STUDENT_ID').unsigned().comment('Student ID');
@@ -33,7 +35,7 @@ exports.auto = (migrator) => [
   migrator('STUDENTS_CLASSES_DETAIL', (table) => {
     table.bigInteger('MY_STUDENT_ID').unsigned().comment('Student ID');
     table.bigInteger('MY_CLASS_ID').unsigned().comment('Class ID');
-    table.string('NOTE', 'longtext').notNullable().comment('Note');
+    table.text('NOTE', 'longtext').notNullable().comment('Note');
 
     table.unique(['MY_STUDENT_ID', 'MY_CLASS_ID'], 'UK_STUDENTS_CLASSES');
   }),
