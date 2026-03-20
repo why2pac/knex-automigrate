@@ -168,6 +168,65 @@ describe('knex-automigrate (ts)', () => {
     await getKnex().schema.dropView(viewName);
   });
 
+  describe('scenario: initRows — initial data seeding', () => {
+    const seedTable = `TEST_TS_SEED_${new Date().getTime()}`;
+
+    afterAll(async () => {
+      await getKnex().schema.dropTableIfExists(seedTable);
+    });
+
+    it('inserts seed rows into a newly created table', async () => {
+      await Automigrate({
+        verbose: false,
+        config,
+        cwd: __dirname,
+        tables: (migrator) => [
+          migrator(
+            seedTable,
+            (table) => {
+              table.string('CODE', 32).notNullable().primary().comment('Code');
+              table.string('LABEL', 128).notNullable().comment('Label');
+            },
+            () => [
+              { CODE: 'A', LABEL: 'Alpha' },
+              { CODE: 'B', LABEL: 'Beta' },
+            ],
+          ),
+        ],
+      });
+
+      const rows = await getKnex()(seedTable).select('CODE', 'LABEL').orderBy('CODE');
+      expect(rows).toEqual([
+        { CODE: 'A', LABEL: 'Alpha' },
+        { CODE: 'B', LABEL: 'Beta' },
+      ]);
+    });
+
+    it('does not re-insert seed rows when the table already has data', async () => {
+      await Automigrate({
+        verbose: false,
+        config,
+        cwd: __dirname,
+        tables: (migrator) => [
+          migrator(
+            seedTable,
+            (table) => {
+              table.string('CODE', 32).notNullable().primary().comment('Code');
+              table.string('LABEL', 128).notNullable().comment('Label');
+            },
+            () => [
+              { CODE: 'A', LABEL: 'Alpha' },
+              { CODE: 'B', LABEL: 'Beta' },
+            ],
+          ),
+        ],
+      });
+
+      const result = await getKnex()(seedTable).count('* as cnt').first();
+      expect(Number((result as any).cnt)).toBe(2);
+    });
+  });
+
   describe('scenario: file-based migration', () => {
     const fileViews = ['STUDENT_INFORMATION', 'KEYVALS_ID2'];
     const fileTables = [
