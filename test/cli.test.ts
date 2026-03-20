@@ -8,6 +8,7 @@ const config = require('./migration/knex.config');
 const CLI = path.join(__dirname, '..', 'bin', 'cli.js');
 const MIGRATION_CWD = path.join(__dirname, 'migration');
 const KNEXFILE = path.join(MIGRATION_CWD, 'knex.config.js');
+const ENV_KNEXFILE = path.join(MIGRATION_CWD, 'knex.env.config.js');
 
 const run = (args: string[], opts: Record<string, any> = {}) => spawnSync(process.execPath, [CLI, ...args], {
   encoding: 'utf8',
@@ -20,6 +21,19 @@ describe('CLI — no database required (ts)', () => {
     const result = run(['--version']);
     expect(result.status).toBe(0);
     expect(result.stdout).toContain(pkg.version);
+  });
+
+  it('prints help text when --help is passed', () => {
+    const result = run(['--help']);
+    expect(result.stdout).toContain('migrate:auto');
+    expect(result.stdout).toContain('--knexfile');
+  });
+
+  it('prints help text when no command is given', () => {
+    const result = run([]);
+    const output = result.stdout + result.stderr;
+    expect(output).toContain('migrate:auto');
+    expect(output).toContain('--knexfile');
   });
 
   it('exits 1 with an error message when no knexfile is found', () => {
@@ -62,6 +76,20 @@ describe('CLI — migrate:auto (ts)', () => {
   it('is idempotent — exits 0 on a second run', () => {
     const result = run(['migrate:auto', '--knexfile', KNEXFILE, '--cwd', MIGRATION_CWD]);
     expect(result.status).toBe(0);
+    expect(result.stdout).toContain('Migration successfully done');
+  });
+
+  it('runs successfully with --safe flag', () => {
+    const result = run(['migrate:auto', '--safe', '--knexfile', KNEXFILE, '--cwd', MIGRATION_CWD]);
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('Migration successfully done');
+  });
+
+  it('runs successfully with --env flag selecting an environment', () => {
+    const result = run(['migrate:auto', '--env', 'production', '--knexfile', ENV_KNEXFILE, '--cwd', MIGRATION_CWD]);
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('Using environment:');
+    expect(result.stdout).toContain('production');
     expect(result.stdout).toContain('Migration successfully done');
   });
 });
