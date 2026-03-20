@@ -55,7 +55,7 @@
     "index.js",
     "LICENSE"
   ],
-  "author": "GONZO",
+  "author": "why2pac",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/why2pac/knex-automigrate/issues"

@@ -3,6 +3,14 @@ module.exports = {
   env: {
     jest: true,
   },
+  overrides: [
+    {
+      files: ['test/**/*.js'],
+      env: {
+        mocha: true,
+      },
+    },
+  ],
   rules: {
     'prefer-destructuring': [
       'error', {
