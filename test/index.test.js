@@ -726,7 +726,7 @@ describe('knex-automigrate', () => {
 
   describe('file-based migration', () => {
     // All tables/views produced by test/migration/table_*.js and view_*.js files.
-    // Drop order respects FK dependencies (child tables before parents).
+    // Tables are listed in FK-safe drop order (STUDENTS before PHONES).
     const fileViews = ['STUDENT_INFORMATION', 'KEYVALS_ID2'];
     const fileTables = [
       'STUDENTS_CLASSES_DETAIL',
@@ -739,11 +739,14 @@ describe('knex-automigrate', () => {
       'KEYVALS_ID',
     ];
 
+    // Views are dropped in parallel (no FK deps).
+    // Tables are dropped sequentially to respect FK order (STUDENTS before PHONES).
     const dropAll = async () => {
-      await getKnex().raw('SET foreign_key_checks = 0');
       await Promise.all(fileViews.map((v) => getKnex().schema.dropViewIfExists(v)));
-      await Promise.all(fileTables.map((t) => getKnex().schema.dropTableIfExists(t)));
-      await getKnex().raw('SET foreign_key_checks = 1');
+      await fileTables.reduce(
+        (chain, t) => chain.then(() => getKnex().schema.dropTableIfExists(t)),
+        Promise.resolve(),
+      );
     };
 
     beforeAll(dropAll);
