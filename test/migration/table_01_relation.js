@@ -1,5 +1,3 @@
-/* eslint-disable newline-per-chained-call, global-require, no-undef */
-
 exports.auto = (migrator) => [
   migrator('PHONES', (table) => {
     table.bigIncrements('PHONE_ID').unsigned().comment('Primary Key for Table.');

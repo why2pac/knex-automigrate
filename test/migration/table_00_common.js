@@ -1,5 +1,3 @@
-/* eslint-disable newline-per-chained-call, global-require, no-undef */
-
 exports.auto = (migrator, knex) => [
   migrator('KEYVALS_ID', (table) => {
     table.string('ID', 128).notNullable().primary().comment('Key');
