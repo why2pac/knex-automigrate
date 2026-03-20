@@ -832,5 +832,4 @@ describe('knex-automigrate', () => {
       );
     });
   });
-
 });
