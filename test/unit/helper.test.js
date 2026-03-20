@@ -27,11 +27,8 @@ describe('helper', () => {
       assert.strictEqual(helper.innerBrackets('KEY ()'), '');
     });
 
-    it('documents quirk: closing bracket before opening bracket returns empty string, not null', () => {
-      // ') foo (' → indexOf('(')=7, lastIndexOf(')')=0 → neither is -1 (null check is bypassed)
-      // → slice(begin+1, end) = slice(8, 0) = '' instead of null.
-      // TypeScript refactoring should add a begin > end guard.
-      assert.strictEqual(helper.innerBrackets(') foo ('), '');
+    it('returns null when closing bracket appears before opening bracket', () => {
+      assert.strictEqual(helper.innerBrackets(') foo ('), null);
     });
 
     it('handles UNIQUE KEY line as produced by SHOW CREATE TABLE', () => {
@@ -126,12 +123,8 @@ describe('helper', () => {
       assert.strictEqual(helper.firstQuoteValue('KEY `` ()'), '');
     });
 
-    it('documents bug: only one backtick causes slice(0,-1) to truncate the last character', () => {
-      // If there is no closing backtick, indexOf('`') on the remainder returns -1.
-      // slice(0, -1) then removes the last character of the extracted string.
-      // e.g. 'KEY `idx_name' → remainder = 'idx_name' → slice(0,-1) = 'idx_nam'
-      // TypeScript refactoring must guard against -1 before slicing.
-      assert.strictEqual(helper.firstQuoteValue('KEY `idx_name'), 'idx_nam');
+    it('returns the full value when no closing backtick is present', () => {
+      assert.strictEqual(helper.firstQuoteValue('KEY `idx_name'), 'idx_name');
     });
   });
 
@@ -155,13 +148,6 @@ describe('helper', () => {
     it('returns true for two empty arrays (length equality check: 0 === 0)', () => {
       // a.length === b.length → 0 === 0 → true, and [].every() vacuously returns true.
       assert.ok(helper.isArrayEqual([], []));
-    });
-
-    it('documents that the typeof chain shortcut is dead code', () => {
-      // typeof(a) === typeof(b) evaluates to a boolean.
-      // boolean === 'string' is always false, so the string-equality branch is never reached.
-      const result = typeof ('x') === typeof ('y') === 'string';
-      assert.strictEqual(result, false);
     });
 
     it('returns falsy when array lengths differ (longer second array)', () => {
