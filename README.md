@@ -82,7 +82,49 @@ App
 
 ### After (database migration with knex-automigrate)
 
-Simply define your schema once and run `migrate:auto` — columns are added, altered, or dropped automatically to match the definition.
+Migration files are named with `table_` or `view_` prefix. The prefix determines whether the file defines table schemas or view schemas.
+
+```javascript
+// table_users.js
+exports.auto = function(migrator, knex) {
+  return [
+    migrator('users', function(table) {
+      table.increments('user_id').unsigned().comment('PK');
+      table.string('email', 64).notNullable().comment('E-Mail');
+      table.string('name', 64).notNullable().comment('Name');
+    }),
+  ];
+};
+```
+
+```javascript
+// view_users.js
+exports.auto = function(migrator, knex) {
+  return [
+    migrator('user_information', (view) => {
+      // If view.columns() is missing,
+      // the columns will default to those defined in the 'select()' statement.
+      view.as(knex('users').select('user_id', 'email', 'name'));
+    }),
+  ];
+};
+```
+
+```bash
+$ knex-automigrate migrate:auto
+```
+
+Migration files are,
+
+```
+App
+　├─ migrations
+　│　　├─ table_users.js
+　│　　└─ view_users.js
+　└─ knexfile.js
+```
+
+Simply edit the schema file and run `migrate:auto` again — columns are added, altered, or dropped automatically to match the definition.
 
 ### CLI
 
@@ -101,52 +143,6 @@ Options:
   --env [name]       environment, default: process.env.NODE_ENV || development
   -h, --help         output usage information
 ```
-
-### File-based migration
-
-```
-App
-  ├─ migrations
-  │    ├─ table_users.js
-  │    ├─ table_orders.js
-  │    ├─ view_user_summary.js
-  │    └─ knexfile.js
-```
-
-```javascript
-// table_users.js
-exports.auto = function(migrator, knex) {
-  return [
-    migrator('users', function(table) {
-      table.increments('user_id').unsigned().comment('PK');
-      table.string('email', 128).notNullable().comment('E-Mail');
-      table.string('name', 64).notNullable().comment('Name');
-      table.datetime('created_at').notNullable().defaultTo(knex.fn.now()).comment('Created at');
-
-      table.unique(['email'], 'uk_users_email');
-    }),
-  ];
-};
-```
-
-```javascript
-// view_user_summary.js
-exports.auto = function(migrator, knex) {
-  return [
-    migrator('user_summary', function(view) {
-      // If view.columns() is omitted,
-      // the columns default to those defined in the select() statement.
-      view.as(knex('users').select('user_id', 'email', 'name'));
-    }),
-  ];
-};
-```
-
-```bash
-$ knex-automigrate migrate:auto --knexfile ./migrations/knexfile.js --cwd ./migrations
-```
-
-Simply edit the schema file and run `migrate:auto` again — columns are added, altered, or dropped to match the schema definition.
 
 ## Programmatic Usage
 
