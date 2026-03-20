@@ -1,5 +1,3 @@
-/* eslint-disable newline-per-chained-call, global-require, no-undef */
-
 exports.auto = (migrator, knex) => [
   migrator('STUDENT_INFORMATION', (view) => {
     view.columns(['student_id', 'name', 'home_phone_number', 'mobile_phone_number', 'email']);
