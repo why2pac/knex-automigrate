@@ -1,5 +1,5 @@
 const assert = require('assert');
-const MySqlDialect = require('../../lib/index/dialects/mysql');
+const MySqlDialect = require('../../dist/index/dialects/mysql').default;
 
 function makeKnex(createTableSql) {
   return {

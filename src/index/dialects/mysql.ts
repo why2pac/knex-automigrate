@@ -1,6 +1,8 @@
-const helper = require('../helper');
+import { Knex } from 'knex';
+import * as helper from '../helper';
+import { IndexData } from '../index';
 
-module.exports = async function MySqlDialect(knex, tableName) {
+export default async function parseMySqlSchema(knex: Knex, tableName: string): Promise<IndexData> {
   const startsWithKeyPK = 'PRIMARY KEY';
   const startsWithKeyUK = 'UNIQUE KEY';
   const startsWithKeyKey = 'KEY';
@@ -8,15 +10,15 @@ module.exports = async function MySqlDialect(knex, tableName) {
   const startsWithKeyFulltextKey = 'FULLTEXT KEY';
   const startsWithKeys = [startsWithKeyPK, startsWithKeyUK, startsWithKeyKey, startsWithKeyFk, startsWithKeyFulltextKey];
 
-  let schema = await knex.raw(`SHOW CREATE TABLE \`${tableName}\``);
-  schema = schema[0][0]['Create Table'].split('\n')
-    .map((e) => e.trim())
-    .filter((e) => startsWithKeys.some((k) => e.indexOf(k) === 0));
+  const raw = await knex.raw(`SHOW CREATE TABLE \`${tableName}\``);
+  const schema = (raw[0][0]['Create Table'] as string).split('\n')
+    .map((e: string) => e.trim())
+    .filter((e: string) => startsWithKeys.some((k) => e.indexOf(k) === 0));
 
-  const primaryKeys = [];
-  const uniqueKeys = {};
-  const indexKeys = {};
-  const foreignKeys = {};
+  const primaryKeys: string[][] = [];
+  const uniqueKeys: Record<string, string[]> = {};
+  const indexKeys: Record<string, string[]> = {};
+  const foreignKeys: Record<string, { key: string[]; ref: { table: string; key: string[] } }> = {};
 
   schema.forEach((e) => {
     if (e.indexOf(startsWithKeyPK) === 0) {
@@ -75,4 +77,4 @@ module.exports = async function MySqlDialect(knex, tableName) {
     key: indexKeys,
     fk: foreignKeys,
   };
-};
+}

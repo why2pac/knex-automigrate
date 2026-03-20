@@ -2,13 +2,17 @@
   "name": "knex-automigrate",
   "version": "0.1.8",
   "description": "Table schema based database migration tool, built on top of the knex.js",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "jest --coverage --detectOpenHandles",
+    "build": "tsc",
+    "pretest": "tsc",
+    "test": "jest --coverage --detectOpenHandles --runInBand",
     "test:migrate": "node bin/cli.js migrate:auto --safe --knexfile ./test/migration/knex.config.js --cwd ./test/migration",
     "check": "npm-check",
     "lint": "eslint ./",
     "lintfix": "eslint ./ --fix",
+    "prepare": "npm run build",
     "release:patch": "npm version patch --no-git-tag-version",
     "prerelease": "git diff --exit-code",
     "release": "npm run release:patch && export RELEASE_VER=$(node -e \"console.log(require('./package.json').version)\") && git checkout -b feature/bump-ver_${RELEASE_VER} && git add . && git commit -m \"Bump version, v${RELEASE_VER}\" &&git tag -a v${RELEASE_VER} -m \"Release version, v${RELEASE_VER}\" && git push --set-upstream origin feature/bump-ver_${RELEASE_VER} && git push origin v${RELEASE_VER}"
@@ -23,7 +27,8 @@
     "database",
     "orm",
     "table",
-    "migration"
+    "migration",
+    "typescript"
   ],
   "dependencies": {
     "chalk": "^4.1.2",
@@ -37,13 +42,15 @@
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
+    "@types/node": "^22.15.0",
     "eslint": "^8.57.1",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.32.0",
     "jest": "^30.3.0",
     "mysql": "^2.18.1",
     "mysql2": "^3.20.0",
-    "ts-jest": "^29.4.6"
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.8.0"
   },
   "bin": {
     "knex-automigrate": "./bin/cli.js"
@@ -51,8 +58,7 @@
   "files": [
     "README.md",
     "bin/*",
-    "lib/*",
-    "index.js",
+    "dist/**/*",
     "LICENSE"
   ],
   "author": "why2pac",
