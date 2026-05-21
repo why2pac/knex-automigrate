@@ -1,6 +1,6 @@
 {
   "name": "knex-automigrate",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "description": "Table schema based database migration tool, built on top of the knex.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
